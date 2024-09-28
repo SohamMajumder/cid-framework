@@ -10,7 +10,7 @@ Parameters:
     Description: Name of the S3 Bucket to be created to hold data information
     AllowedPattern: (?=^.{3,63}$)(?!^(\d+\.)+\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)
   DestinationBucketARN:
-    Type: Stringr
+    Type: String
     Description: ARN of the S3 Bucket that exists or needs to be created to hold rightsizing information
   MultiAccountRoleName:
     Type: String
