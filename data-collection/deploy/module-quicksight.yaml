@@ -10,7 +10,7 @@ Parameters:
     Description: Name of the S3 Bucket to be created to hold data information
     AllowedPattern: (?=^.{3,63}$)(?!^(\d+\.)+\d+$)(^(([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])\.)*([a-z0-9]|[a-z0-9][a-z0-9\-]*[a-z0-9])$)
   DestinationBucketARN:
-    Type: String
+    Type: Stringr
     Description: ARN of the S3 Bucket that exists or needs to be created to hold rightsizing information
   MultiAccountRoleName:
     Type: String
@@ -196,10 +196,10 @@ Resources:
               try:
                   return list(quicksight.get_paginator('list_namespaces').paginate(AwsAccountId=account_id).search('Namespaces'))
               except quicksight.exceptions.ResourceNotFoundException as e:
-                  logger.error("No Namespace data found. Error: %s", e)
+                  logger.debug("No Namespace data found. Error: %s", e)
               except Exception as e:
                   logger.error("Error in list_namespaces: %s",e)
-              return namespaces
+              return []
 
           def list_users(account_id, namespace, quicksight):
               """Listing of Users under Namespace in the Account"""
@@ -214,7 +214,7 @@ Resources:
                   logger.debug("No User data found. %s", e)
               except Exception as e:
                   logger.error('Error in list_users %s', e)
-              return users
+              return []
 
           def list_groups(account_id, namespace, quicksight):
               """Listing of Groups under Namespace in the Account"""
