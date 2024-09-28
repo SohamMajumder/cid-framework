@@ -118,7 +118,6 @@ Resources:
           ROLE_NAME = os.environ['ROLE_NAME']
           TMP_FILE = "/tmp/tmp.json"
 
-
           logger = logging.getLogger(__name__)
           logger.setLevel(getattr(logging, os.environ.get('LOG_LEVEL', 'INFO').upper(), logging.INFO))
 
@@ -128,7 +127,6 @@ Resources:
                   if isinstance(o, (datetime.date, datetime.datetime)):
                       return o.isoformat()
                   return None
-
 
           def assume_role(account_id, service, region):
               """Assumes Role for accessing Quicksight data"""
@@ -159,16 +157,17 @@ Resources:
 
               quicksight_client = assume_role(account_id, "quicksight")  # starting with the current region 
               namespaces = list(list_namespaces(account_id=account_id, quicksight=quicksight_client))
-              capacity_region = namespace[0]['CapacityRegion']
-              if quicksight_client.meta.region_name != capacity_region:
-                  logger.info("Switiching to %s", capacity_region)
-                  quicksight_client = assume_role(account_id, "quicksight", capacity_region
 
               users = []
               groups = []
               group_memberships = []
 
               for namespace in namespaces:
+                  capacity_region = namespaces[0]['CapacityRegion']
+                  if quicksight_client.meta.region_name != capacity_region:
+                      logger.info("Switiching to %s", capacity_region)
+                      quicksight_client = assume_role(account_id, "quicksight", capacity_region
+
                   logger.debug(f"namespace={namespace}")
                   namespace_users = list_users(account_id=account_id, namespace=namespace['Name'], quicksight=quicksight_client)
                   users.extend(namespace_users)
@@ -359,7 +358,7 @@ Resources:
       Description: !Sub "Provides a summary view of the ${CFDataName}"
       Name: !Sub "${CFDataName}_view"
       QueryString: !Sub |
-        CREATE OR REPLACE VIEW ${CFDataName}_view AS
+        CREATE OR REPLACE VIEW "${CFDataName}_view" AS
         SELECT 
             quser.arn userarn,
             quser.username,
@@ -370,10 +369,10 @@ Resources:
             qgroup.groupname,
             quser.account_id,
             quser.payer_id
-        FROM "optimization_data"."quicksight_groupmembership_data" qgroupmem
-        JOIN "optimization_data"."quicksight_user_data" quser ON quser.arn = qgroupmem.arn
+        FROM "${DatabaseName}"."quicksight_groupmembership_data" qgroupmem
+        JOIN "${DatabaseName}"."quicksight_user_data" quser ON quser.arn = qgroupmem.arn
           AND quser.payer_id = qgroupmem.payer_id
           AND quser.account_id = qgroupmem.account_id
-        JOIN "optimization_data"."quicksight_group_data" qgroup ON qgroup.groupname = qgroupmem.groupname
+        JOIN "${DatabaseName}"."quicksight_group_data" qgroup ON qgroup.groupname = qgroupmem.groupname
           AND qgroup.payer_id = qgroupmem.payer_id
           AND qgroup.account_id = qgroupmem.account_id
