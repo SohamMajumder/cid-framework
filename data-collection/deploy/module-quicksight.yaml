@@ -153,7 +153,7 @@ Resources:
               account_id = account["account_id"]
               payer_id = account["payer_id"]
 
-              logger.info("Collecting data for account: %s", account_id)
+              logger.debug("Collecting data for account: %s", account_id)
 
               quicksight_client = assume_role(account_id, "quicksight")  # starting with the current region 
               namespaces = list(list_namespaces(account_id=account_id, quicksight=quicksight_client))
@@ -163,12 +163,12 @@ Resources:
               group_memberships = []
 
               for namespace in namespaces:
+                  logger.debug(f"processing namespace={namespace}")
                   capacity_region = namespaces[0]['CapacityRegion']
                   if quicksight_client.meta.region_name != capacity_region:
-                      logger.info("Switiching to %s", capacity_region)
+                      logger.debug("Switiching to %s", capacity_region)
                       quicksight_client = assume_role(account_id, "quicksight", capacity_region
 
-                  logger.debug(f"namespace={namespace}")
                   namespace_users = list_users(account_id=account_id, namespace=namespace['Name'], quicksight=quicksight_client)
                   users.extend(namespace_users)
 
